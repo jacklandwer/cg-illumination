@@ -163,7 +163,7 @@ class Renderer {
         light0.specular = new Color3(1.0, 1.0, 1.0);
         current_scene.lights.push(light0);
 
-        let light1 = new PointLight('light1', new Vector3(0.0, 3.0, 0.0), scene);
+        let light1 = new PointLight('light1', new Vector3(0.0, 3.0, 0.0), scene); // THIS LIGHT DOESNT SEEM TO BE DIFFERENT RN..
         light1.diffuse = new Color3(1.0, 1.0, 1.0);
         light1.specular = new Color3(1.0, 1.0, 1.0);
         current_scene.lights.push(light1);

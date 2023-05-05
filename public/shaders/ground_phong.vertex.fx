@@ -36,22 +36,22 @@ void main() {
     */
 
     
-    // Get initial position of vertex (prior to height displacement)
+    // Get initial position of vertex.
     vec4 world_pos = world * vec4(position, 1.0);
 
-    // Apply height displacement
+    // Apply height displacement.
     vec2 normalized_pos = (position.xy + vec2(0.5)) / ground_size;
     float height = texture(heightmap, normalized_pos).r * height_scalar;
     vec4 displaced_pos = vec4(position.x, position.y + height, position.z, 1.0);
 
-    // Calculate normal for displaced vertex
-    vec3 normal = normalize(cross(dFdx(displaced_pos.xyz), dFdy(displaced_pos.xyz)));
+    // Calculate normal for displaced vertex.
+    vec3 normal = normalize(cross(normalize(displaced_pos.xyz), normalize(displaced_pos.xyz))); 
 
-    // Pass vertex normal and texcoord onto the fragment shader
+    // Pass vertex normal and texture to the fragment shader.
     model_normal = normal;
     model_uv = uv * texture_scale;
 
-    // Transform and project vertex from 3D world-space to 2D screen-space
+    // Transform and project vertex from 3D world-space to 2D screen-space.
     gl_Position = projection * view * world * displaced_pos;
 
 
