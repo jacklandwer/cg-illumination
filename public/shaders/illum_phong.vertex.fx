@@ -19,6 +19,7 @@ out vec3 model_normal;
 out vec2 model_uv;
 
 void main() {
+    /*
     // Pass vertex normal onto the fragment shader
     model_normal = normal;
     // Pass vertex texcoord onto the fragment shader
@@ -26,4 +27,18 @@ void main() {
 
     // Transform and project vertex from 3D world-space to 2D screen-space
     gl_Position = projection * view * world * vec4(position, 1.0);;
+    */
+
+
+    // Transform vertex normal to world space and normalize it
+    mat3 normal_matrix = transpose(inverse(mat3(world)));
+    vec3 world_normal = normalize(normal_matrix * normal);
+    // Pass vertex normal and texcoord onto the fragment shader
+    model_normal = world_normal;
+    model_uv = uv * texture_scale;
+
+    // Transform and project vertex from 3D world-space to 2D screen-space
+    gl_Position = projection * view * world * vec4(position, 1.0);
+    
+
 }
