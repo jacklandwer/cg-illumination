@@ -24,6 +24,7 @@ void main() {
     vec3 ambient_illum = model_color * ambient;
     
     vec4 total = vec4(model_color * ambient, 1.0) + vec4(diffuse_illum * model_color, 1.0) + vec4(specular_illum * mat_specular, 1.0);
+
     vec4 bound = vec4(1.0);
     // Color
     FragColor = min(bound, total);

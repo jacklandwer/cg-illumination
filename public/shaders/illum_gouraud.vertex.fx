@@ -27,21 +27,27 @@ out vec3 diffuse_illum;
 out vec3 specular_illum;
 
 void main() {
-    // Pass diffuse and specular illumination onto the fragment shader
+    // Initialize diffuse and specular
     diffuse_illum = vec3(0.0, 0.0, 0.0);
     specular_illum = vec3(0.0, 0.0, 0.0);
 
-    vec4 test = world * vec4(position, 1.0);
+    // Initialize position and vertex normal
+    vec3 model_position = vec3(world * vec4(position, 1.0));
 
-    //calculate vectors
-    vec3 N = normalize(normal); // surface normal
-    vec3 L = normalize(light_positions[0]); // light normal
-    vec3 R = normalize(2.0 * dot(N,L) * N - L); // reflected light normal
-    vec3 V = normalize(camera_position); // normalized camera
+    mat3 world_transpose = mat3(inverse(transpose(world)));
+    vec3 model_normal = normalize(world_transpose * normal);
+    
+    for (int i = 0; i < num_lights; i++) {
+        //calculate vectors
+        vec3 N = model_normal; // surface normal
+        vec3 L = normalize(light_positions[i] - model_position); // light direction
+        vec3 R = reflect(-L, N);; // reflected light direction
+        vec3 V = normalize(camera_position - model_position); // view direction
 
-    //pass diffuse and specular
-    diffuse_illum = vec3(light_colors[0]  * max(dot(N, L), 0.0));
-    specular_illum = vec3(light_colors[0]  * pow(max(dot(R, V), 0.0), mat_shininess));
+        //pass diffuse and specular
+        diffuse_illum += vec3(light_colors[i]  * max(dot(N, L), 0.0));
+        specular_illum += vec3(light_colors[i]  * pow(max(dot(R, V), 0.0), mat_shininess));
+    }
 
     // Pass vertex texcoord onto the fragment shader
     model_uv = uv;
