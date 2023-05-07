@@ -20,6 +20,7 @@ uniform vec2 texture_scale;
 // Output
 out vec3 model_normal;
 out vec2 model_uv;
+out vec4 vertWorld;
 
 void main() {
     /*
@@ -37,7 +38,7 @@ void main() {
 
     
     // Get initial position of vertex.
-    vec4 world_pos = world * vec4(position, 1.0);
+    vertWorld = world * vec4(position, 1.0); 
 
     // Apply height displacement.
     vec2 normalized_pos = (position.xy + vec2(0.5)) / ground_size;
@@ -45,7 +46,7 @@ void main() {
     vec4 displaced_pos = vec4(position.x, position.y + height, position.z, 1.0);
 
     // Calculate normal for displaced vertex.
-    vec3 normal = normalize(cross(normalize(displaced_pos.xyz), normalize(displaced_pos.xyz))); 
+    vec3 normal = cross(normalize(displaced_pos.xyz), normalize(displaced_pos.xyz)); 
 
     // Pass vertex normal and texture to the fragment shader.
     model_normal = normal;

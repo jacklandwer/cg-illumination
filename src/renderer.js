@@ -47,6 +47,24 @@ class Renderer {
             scene.ground_mesh = ground_mesh_callback(scene.scene, scene.ground_subdivisions);
             this['createScene'+ idx](idx);
         });
+
+        // light translations from keyboard input
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'A') { 
+                this.translateNegativeX();
+            } else if (event.key === 'D') { 
+                this.translatePositiveX();
+            } else if (event.key === 'F') { 
+                this.translateNegativeY();
+            } else if (event.key === 'R') { 
+                this.translatePositiveY();
+            } else if (event.key === 'W') { 
+                this.translateNegativeZ();
+            } else if (event.key === 'S') { 
+                this.translatePositiveZ();
+            }
+        });
+
     }
 
     createScene0(scene_idx) {
@@ -185,7 +203,7 @@ class Renderer {
 
         // Create other models
         let sphere = CreateSphere('sphere', {segments: 32}, scene);
-        sphere.position = new Vector3(4.5, -0.2, 5.0);
+        sphere.position = new Vector3(4.45, 1.25, 4.4);
         sphere.metadata = {
             mat_color: new Color3(0.30, 0.55, 0.88),
             mat_texture: white_texture,
@@ -197,7 +215,7 @@ class Renderer {
         current_scene.models.push(sphere);
 
         let box = CreateBox('box', {width: 2, height: 1, depth: 1}, scene);
-        box.position = new Vector3(-1.0, -0.5, 3.5);
+        box.position = new Vector3(-1.0, 0.5, 3.5);
         box.metadata = {
             mat_color: new Color3(0.75, 0.25, 0.95),
             mat_texture: white_texture,
@@ -236,6 +254,56 @@ class Renderer {
         //copy necessary code from example
 
         
+
+    }
+
+
+   
+
+    translatePositiveX(){
+        let scene = this.scenes[this.active_scene];
+        let lights = scene.lights[this.active_light];
+        // get the current position of the light
+        let curLightPosX = lights.position;
+        // add 1 to X coord 
+
+        console.log("scene: " + scene);
+        console.log("lights: " + lights);
+        console.log("curLightPosX: " + curLightPosX);
+
+        // either set it directly or compute coords then set as 
+        this.scenes[this.active_scene].lights[this.active_light].position.x = curLightPosX + 1;
+
+
+
+    } 
+    
+    
+    translateNegativeX(){
+
+
+    }
+
+    translatePositiveY(){
+
+
+    }
+
+
+    translateNegativeY(){
+
+
+    }
+
+
+    translatePositiveZ(){
+
+
+    }
+
+
+    translateNegativeZ(){
+
 
     }
 
