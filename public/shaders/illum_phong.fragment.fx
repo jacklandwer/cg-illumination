@@ -2,9 +2,9 @@
 precision mediump float;
 
 // Input
-in vec3 model_normal;
+smooth in vec3 model_normal;
 in vec2 model_uv;
-in vec4 vertOut;
+in vec3 model_position;
 
 // Uniforms
 // material
@@ -24,32 +24,33 @@ uniform vec3 light_colors[8]; // Ip
 out vec4 FragColor;
 
 void main() {
-    // Color
-    //FragColor = vec4(mat_color * texture(mat_texture, model_uv).rgb, 1.0);
+    vec3 ambient_value = vec3(0.0, 0.0, 0.0);
+    vec3 diffuse_value = vec3(0.0, 0.0, 0.0);
+    vec3 specular_value = vec3(0.0, 0.0, 0.0);
 
-
-    vec3 ambient_color = ambient * mat_color;
-    vec3 diffuse_color = vec3(0.0);
-    vec3 specular_color = vec3(0.0);
+    // Ambient: Ia * Ka
+    ambient_value += ambient * mat_color;
 
     for (int i = 0; i < num_lights; i++) {
-        vec3 light_dir = normalize(light_positions[i] - vec3(vertOut.xy, 0.0));
-        vec3 view_dir = normalize(camera_position - vec3(vertOut.xy, 0.0));
-        vec3 halfway_dir = normalize(light_dir + view_dir);
+        // Diffuse: Ip * Kd * dot(N, L)
+            // L (Light Direction)
+        vec3 light_dir = normalize(light_positions[i] - model_position);
+            // dot(N, L)
+        float n_dot_l = max(dot(model_normal, light_dir), 0.0);
+            // Calculate diffuse
+        diffuse_value += light_colors[i] * mat_color * n_dot_l;
 
-        float diffuse_factor = max(dot(model_normal, light_dir), 0.0);
-        vec3 diffuse_contribution = diffuse_factor * light_colors[i];
-
-        float specular_factor = pow(max(dot(model_normal, halfway_dir), 0.0), mat_shininess);
-        vec3 specular_contribution = specular_factor * mat_specular * light_colors[i];
-
-        diffuse_color += diffuse_contribution;
-        specular_color += specular_contribution;
+        // Specular: Ip * Ks * dot(R, V)^n
+            // V (View direction)
+        vec3 view_dir = normalize(camera_position - model_position);
+            // R (Reflected light direction)
+        vec3 reflect_dir = reflect(-light_dir, model_normal);
+            // dot(R, V)
+        float r_dot_v = max(dot(view_dir, reflect_dir), 0.0);
+            // Calculate specular
+        specular_value += light_colors[i] * mat_specular * pow(r_dot_v, mat_shininess);
     }
-
-    // Combine the colors
-    vec3 final_color = ambient_color + diffuse_color + specular_color;
-    FragColor = vec4(final_color, 1.0) * texture(mat_texture, model_uv); //FragColor = vec4(mat_color * texture(mat_texture, model_uv).rgb, 1.0);
-
-
+    // Color
+    vec3 final_lighting = (ambient_value + diffuse_value + specular_value) * texture(mat_texture, model_uv).rgb;
+    FragColor = vec4(clamp(final_lighting, 0.0, 1.0), 1.0);
 }

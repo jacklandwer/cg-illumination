@@ -33,10 +33,6 @@ void main() {
     // Get initial position of vertex (prior to height displacement)
     vec4 world_pos = world * vec4(position, 1.0);
 
-    // Pass diffuse and specular illumination onto the fragment shader
-    // diffuse_illum = vec3(0.0, 0.0, 0.0);
-    // specular_illum = vec3(0.0, 0.0, 0.0);
-
     float gray = texture(heightmap, uv)[0];
     float d = 2.0 * height_scalar * (gray - 0.5);
 
@@ -67,14 +63,16 @@ void main() {
     vec3 bitangent = nearby2 - new_pos.xyz;
     vec3 normal = normalize(cross(bitangent, tangent));
 
-    vec3 L = normalize(light_positions[0] - new_pos.xyz); // light normal 
-    vec3 R = normalize(2.0 * dot(normal, L) * normal - L); // reflected light normal
-    vec3 V = normalize(camera_position); // normalized camera
+    for (int i = 0; i < num_lights; i++) {
+        vec3 L = normalize(light_positions[i] - new_pos.xyz); // light normal 
+        vec3 R = normalize(2.0 * dot(normal, L) * normal - L); // reflected light normal
+        vec3 V = normalize(camera_position); // normalized camera
 
-    //pass diffuse and specular
-    diffuse_illum = vec3(light_colors[0]  * max(dot(normal, L), 0.0));
-    specular_illum = vec3(light_colors[0]  * pow(max(dot(R, V), 0.0), mat_shininess));
-
+        //pass diffuse and specular
+        diffuse_illum += vec3(light_colors[i]  * max(dot(normal, L), 0.0));
+        specular_illum += vec3(light_colors[i]  * pow(max(dot(R, V), 0.0), mat_shininess));
+    }
+        
     // Pass vertex texcoord onto the fragment shader
     model_uv = uv;
 
