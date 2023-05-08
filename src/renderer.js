@@ -8,7 +8,7 @@ import { RawTexture } from '@babylonjs/core/Materials/Textures/rawTexture';
 import { Color3, Color4 } from '@babylonjs/core/Maths/math.color';
 import { Vector2, Vector3 } from '@babylonjs/core/Maths/math.vector';
 import { KeyboardEventTypes } from '@babylonjs/core';
-import { CreateTorus, Mesh, VertexData } from '@babylonjs/core/Meshes';
+import { CreateTorus, CreateCylinder, CreatePolyhedron, Mesh, VertexData } from '@babylonjs/core/Meshes';
 
 class Renderer {
   constructor(canvas, engine, material_callback, ground_mesh_callback) {
@@ -186,7 +186,7 @@ class Renderer {
     scene.useRightHandedSystem = true;
 
     // Create camera
-    current_scene.camera = new UniversalCamera('camera', new Vector3(0.0, 1.8, 10.0), scene);
+    current_scene.camera = new UniversalCamera('camera', new Vector3(5, 1.8, 10.0), scene);
     current_scene.camera.setTarget(new Vector3(0.0, 1.8, 0.0));
     current_scene.camera.upVector = new Vector3(0.0, 1.0, 0.0);
     current_scene.camera.attachControl(this.canvas, true);
@@ -195,24 +195,44 @@ class Renderer {
     current_scene.camera.maxZ = 100.0;
 
     // Create point light sources
-    let light0 = new PointLight('light0', new Vector3(1.0, 1.0, 5.0), scene);
-    light0.diffuse = new Color3(1.0, 1.0, 1.0);
-    light0.specular = new Color3(1.0, 1.0, 1.0);
+    let light0 = new PointLight('light0', new Vector3(3.75, 1.0, 7.5), scene);
+    light0.diffuse = new Color3(0.7, 0.0, 0.0);
+    light0.specular = new Color3(0.7, 0.0, 0.0);
     current_scene.lights.push(light0);
 
-    let light1 = new PointLight('light1', new Vector3(0.0, 3.0, 0.0), scene);
-    light1.diffuse = new Color3(1.0, 1.0, 1.0);
-    light1.specular = new Color3(1.0, 1.0, 1.0);
+    let light1 = new PointLight('light1', new Vector3(-3.75, 0.5, 7.5), scene);
+    light1.diffuse = new Color3(0.0, 0.7, 0.0);
+    light1.specular = new Color3(0.0, 0.7, 0.0);
     current_scene.lights.push(light1);
+
+    let light2 = new PointLight('light2', new Vector3(1.5, 1.0, 0.0), scene);
+    light2.diffuse = new Color3(1.0, 0.0, 0.0);
+    light2.specular = new Color3(1.0, 0.0, 0.7);
+    current_scene.lights.push(light2);
+
+    let light3 = new PointLight('light3', new Vector3(-6, 10.0, 0.0), scene);
+    light3.diffuse = new Color3(0.5, 0.5, 0.5);
+    light3.specular = new Color3(0.5, 0.5, 0.5);
+    current_scene.lights.push(light3);
+
+    let light4 = new PointLight('light4', new Vector3(0.5, 1.0, 0.5), scene);
+    light4.diffuse = new Color3(1, 0.0, 0.5);
+    light4.specular = new Color3(1, 0.0, 0.5);
+    current_scene.lights.push(light4);
+
+    let light5 = new PointLight('light5', new Vector3(-2, 2.0, -1), scene);
+    light5.diffuse = new Color3(0.0, 0.5, 0.5);
+    light5.specular = new Color3(0.0, 0.5, 0.5);
+    current_scene.lights.push(light5);
 
     // Create ground mesh
     let white_texture = RawTexture.CreateRGBTexture(new Uint8Array([255, 255, 255]), 1, 1, scene);
-    let ground_heightmap = new Texture('/heightmaps/default.png', scene);
-    ground_mesh.scaling = new Vector3(20.0, 1.0, 20.0);
+    let ground_heightmap = new Texture('/heightmaps/heightmap2.png', scene);
+    ground_mesh.scaling = new Vector3(10.0, 1.0, 10.0);
     ground_mesh.metadata = {
-      mat_color: new Color3(0.2, 0.85, 0.25),
+      mat_color: new Color3(0.2, 0.1, 0.25),
       mat_texture: white_texture,
-      mat_specular: new Color3(0.0, 0.0, 0.0),
+      mat_specular: new Color3(0.0, 0.05, 0.0),
       mat_shininess: 1,
       texture_scale: new Vector2(1.0, 1.0),
       height_scalar: 1.0,
@@ -220,21 +240,33 @@ class Renderer {
     };
     ground_mesh.material = materials['ground_' + this.shading_alg];
 
-    // Create other models
-    let sphere = CreateSphere('sphere', { segments: 32 }, scene);
-    sphere.position = new Vector3(4.5, -0.2, 5.0);
-    sphere.metadata = {
-      mat_color: new Color3(0.3, 0.55, 0.88),
+    let polyhedron = CreatePolyhedron('polyhedron', { radius: 2 }, scene);
+    polyhedron.position = new Vector3(1.5, 1.2, 0);
+    polyhedron.metadata = {
+      mat_color: new Color3(1.0, 0.7, 0.2),
+      mat_texture: white_texture,
+      mat_specular: new Color3(0.1, 0.1, 0.1),
+      mat_shininess: 16,
+      texture_scale: new Vector2(1.0, 1.0),
+    };
+    polyhedron.material = materials['illum_' + this.shading_alg];
+    current_scene.models.push(polyhedron);
+
+    let cylinder = CreateCylinder('cylinder', { height: 2, diameter: 2, tessellation: 32 }, scene);
+    cylinder.position = new Vector3(0, 0.2, -2.5);
+    let cylinderColor = new Color3(Math.random(), Math.random(), Math.random());
+    cylinder.metadata = {
+      mat_color: cylinderColor,
       mat_texture: white_texture,
       mat_specular: new Color3(0.8, 0.8, 0.8),
       mat_shininess: 16,
       texture_scale: new Vector2(1.0, 1.0),
     };
-    sphere.material = materials['illum_' + this.shading_alg];
-    current_scene.models.push(sphere);
+    cylinder.material = materials['illum_' + this.shading_alg];
+    current_scene.models.push(cylinder);
 
     let box = CreateBox('box', { width: 2, height: 1, depth: 1 }, scene);
-    box.position = new Vector3(-1.0, -0.5, 3.5);
+    box.position = new Vector3(-1.0, 0.5, 3.5);
     box.metadata = {
       mat_color: new Color3(0.75, 0.25, 0.95),
       mat_texture: white_texture,
