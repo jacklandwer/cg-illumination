@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/cg-illumination/',
+  base: 'jacklandwer/cg-illumination/',
   plugins: [vue()],
   resolve: {
     alias: {
